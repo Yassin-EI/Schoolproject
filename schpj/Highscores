@@ -1,0 +1,35 @@
+import pygame
+import sys
+import sqlite3
+
+connection = sqlite3.connect('highscore')
+cursor = connection.cursor()
+
+
+
+cursor.execute (''' 
+CREATE TABLE IF NOT EXISTS highscore (
+    id INTEGER PRIMARY KEY,
+    player_id INTEGER,
+    player_name TEXT,
+    score INTEGER,
+
+)''')
+
+def add_score(player_name, score):
+    # Insert the new score
+    cursor.execute('INSERT INTO highscores (player_name, score) VALUES (?, ?)', (player_name, score))
+    conn.commit()
+
+    # Remove all entries except the top 5 highest scores
+    cursor.execute('''
+        DELETE FROM highscores
+        WHERE id NOT IN (
+            SELECT id FROM highscores ORDER BY score DESC, timestamp ASC LIMIT 5
+        )
+    ''')
+
+    def get_top_scores():
+        cursor.execute('SELECT player_name, score FROM highscores ORDER BY score DESC, timestamp ASC LIMIT 5')
+        return cursor.fetchall()
+
